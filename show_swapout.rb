@@ -102,7 +102,8 @@ swap = swaptotal - swapfree
 kernel = slab + kernelstack + pagetables
 rss = memtotal - cached - buffers - memfree - kernel
 procs << [0, kernel, 0, 'KERNEL']
-procs << [swap, rss, 0, 'TOTAL']
+procs << [swap, rss, 0, 'TOTAL USED']
+procs << [swaptotal, memtotal, 0, 'TOTAL']
 
 puts "   SWAP     RSS   RATIO     PID NAME"
 procs.sort{|a,b| a[0] <=> b[0]}.each do |procs|
