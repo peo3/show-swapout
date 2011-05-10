@@ -94,7 +94,7 @@ swap = swaptotal - swapfree
 rss = memtotal - cached - buffers - memfree
 procs << [swap, rss, 0, 'TOTAL']
 
-puts "   SWAP     RSS     PID NAME"
+puts "   SWAP     RSS   RATIO     PID NAME"
 procs.sort{|a,b| a[0] <=> b[0]}.each do |procs|
 	swap = procs[0]
 	rss  = procs[1]
@@ -111,5 +111,8 @@ procs.sort{|a,b| a[0] <=> b[0]}.each do |procs|
 		end
 	end
 
-	puts "%s %s %7s %s" % [format(swap), format(rss), pid, name]
+	ratio = swap.to_f*100/(swap+rss)
+	ratio = "%6.1f%%" % [ratio,]
+
+	puts "%s %s %s %7s %s" % [format(swap), format(rss), ratio, pid, name]
 end
