@@ -113,9 +113,9 @@ procs.sort{|a,b| a[0] <=> b[0]}.each do |procs|
 	name = procs[3]
 
 	def format(usage)
-		if usage > 1024*1024
+		if usage >= 1024*1024
 			return "%6.1fG" % [usage.to_f/1024/1024,]
-		elsif usage > 1024
+		elsif usage >= 1024
 			return "%6.1fM" % [usage.to_f/1024,]
 		else
 			return "%6.1fk" % [usage.to_f,]
