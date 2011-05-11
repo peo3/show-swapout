@@ -74,7 +74,7 @@ pids.each do |pid|
 end
 
 buffers = cached = memtotal = memfree = swaptotal = swapfree = 0
-slab = kernelstack = pagetables = 0
+slab = kernelstack = pagetables = swapcached = 0
 path = "/proc/meminfo"
 IO.readlines(path).each do |line|
 	if line =~ /^Buffers:\s+(\d+) kB$/
@@ -95,13 +95,15 @@ IO.readlines(path).each do |line|
 		kernelstack = $1.to_i
 	elsif line =~ /^PageTables:\s+(\d+) kB$/
 		pagetables = $1.to_i
+	elsif line =~ /^SwapCached:\s+(\d+) kB$/
+		swapcached = $1.to_i
 	end
 end
 
 swap = swaptotal - swapfree
 kernel = slab + kernelstack + pagetables
 rss = memtotal - cached - buffers - memfree - kernel
-procs << [0, kernel, 0, 'KERNEL']
+procs << [swapcached, kernel, 0, 'SWAP CACHED / KERNEL']
 procs << [swap, rss, 0, 'TOTAL USED']
 procs << [swaptotal, memtotal, 0, 'TOTAL']
 
@@ -122,8 +124,13 @@ procs.sort{|a,b| a[0] <=> b[0]}.each do |procs|
 		end
 	end
 
-	ratio = swap.to_f*100/(swap+rss)
-	ratio = "%6.1f%%" % [ratio,]
+	if pid.to_i == 0
+		ratio = ' '*7
+		pid   = ' '
+	else
+		ratio = swap.to_f*100/(swap+rss)
+		ratio = "%6.1f%%" % [ratio,]
+	end
 
 	puts "%s %s %s %7s %s" % [format(swap), format(rss), ratio, pid, name]
 end
